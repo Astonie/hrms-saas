@@ -1,0 +1,68 @@
+{
+  "name": "hrms-saas",
+  "version": "1.0.0",
+  "description": "Enterprise Multi-Tenant Human Resources Management System",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && python -m pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=html --cov-report=xml",
+    "test:frontend": "cd frontend && npm run test",
+    "test:backend:unit": "cd backend && python -m pytest tests/unit/ -v",
+    "test:backend:integration": "cd backend && python -m pytest tests/integration/ -v",
+    "test:backend:coverage": "cd backend && python -m pytest tests/ --cov=app --cov-report=html --cov-report=xml",
+    "test:frontend:coverage": "cd frontend && npm run test -- --coverage",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && black --check . && isort --check-only . && flake8 . && mypy app/",
+    "lint:frontend": "cd frontend && npm run lint",
+    "format": "npm run format:backend && npm run format:frontend",
+    "format:backend": "cd backend && black . && isort .",
+    "format:frontend": "cd frontend && npm run format",
+    "security": "npm run security:backend && npm run security:frontend",
+    "security:backend": "cd backend && bandit -r app/ && safety check",
+    "security:frontend": "cd frontend && npm audit",
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "setup:backend": "cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt && pip install -r requirements-test.txt",
+    "setup:frontend": "cd frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && source venv/bin/activate && python -m build",
+    "build:frontend": "cd frontend && npm run build",
+    "clean": "npm run clean:backend && npm run clean:frontend",
+    "clean:backend": "cd backend && rm -rf venv __pycache__ .pytest_cache htmlcov .coverage",
+    "clean:frontend": "cd frontend && rm -rf node_modules dist coverage",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "db:migrate": "cd backend && source venv/bin/activate && alembic upgrade head",
+    "db:rollback": "cd backend && source venv/bin/activate && alembic downgrade -1",
+    "db:reset": "cd backend && source venv/bin/activate && alembic downgrade base && alembic upgrade head",
+    "ci": "npm run lint && npm run test && npm run security",
+    "precommit": "npm run format && npm run lint && npm run test:backend:coverage"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/hrms-saas.git"
+  },
+  "keywords": [
+    "hrms",
+    "saas",
+    "multi-tenant",
+    "human-resources",
+    "fastapi",
+    "react",
+    "typescript",
+    "postgresql"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT"
+}

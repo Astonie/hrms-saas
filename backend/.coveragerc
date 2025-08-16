@@ -1,0 +1,53 @@
+[run]
+source = app
+omit = 
+    */tests/*
+    */migrations/*
+    */__pycache__/*
+    */venv/*
+    */env/*
+    */node_modules/*
+    */dist/*
+    */build/*
+    */coverage/*
+    */htmlcov/*
+    */__init__.py
+    */main.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+    def .*_mock.*:
+    def .*_test.*:
+    def .*_example.*:
+    def .*_sample.*:
+    def .*_demo.*:
+    def .*_placeholder.*:
+    def .*_stub.*:
+    def .*_fake.*:
+    def .*_dummy.*:
+    def .*_mock.*:
+    def .*_test.*:
+    def .*_example.*:
+    def .*_sample.*:
+    def .*_demo.*:
+    def .*_placeholder.*:
+    def .*_stub.*:
+    def .*_fake.*:
+    def .*_dummy.*:
+
+[html]
+directory = htmlcov
+title = HRMS-SAAS Backend Coverage Report
+
+[xml]
+output = coverage.xml
