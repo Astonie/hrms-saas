@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     reload: bool = Field(default=False, env="RELOAD")
     
     # Database Configuration
-    database_url: str = Field(env="DATABASE_URL")
+    # Provide a lightweight sqlite default for local dev so the app can start
+    database_url: str = Field(default="sqlite+aiosqlite:///./dev.db", env="DATABASE_URL")
     database_echo: bool = Field(default=False, env="DATABASE_ECHO")
     database_pool_size: int = Field(default=20, env="DATABASE_POOL_SIZE")
     database_max_overflow: int = Field(default=30, env="DATABASE_MAX_OVERFLOW")
@@ -36,13 +37,14 @@ class Settings(BaseSettings):
     redis_db: int = Field(default=0, env="REDIS_DB")
     
     # JWT Configuration
-    jwt_secret_key: str = Field(env="JWT_SECRET_KEY")
+    # Default secrets are provided for local development only (tests/dev).
+    jwt_secret_key: str = Field(default="""00000000000000000000000000000000""", env="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
     jwt_access_token_expire_minutes: int = Field(default=30, env="JWT_ACCESS_TOKEN_EXPIRE_MINUTES")
     jwt_refresh_token_expire_days: int = Field(default=7, env="JWT_REFRESH_TOKEN_EXPIRE_DAYS")
     
     # OAuth2 Configuration
-    oauth2_secret_key: str = Field(env="OAUTH2_SECRET_KEY")
+    oauth2_secret_key: str = Field(default="""11111111111111111111111111111111""", env="OAUTH2_SECRET_KEY")
     google_client_id: Optional[str] = Field(default=None, env="GOOGLE_CLIENT_ID")
     google_client_secret: Optional[str] = Field(default=None, env="GOOGLE_CLIENT_SECRET")
     github_client_id: Optional[str] = Field(default=None, env="GITHUB_CLIENT_ID")
@@ -66,7 +68,8 @@ class Settings(BaseSettings):
     storage_endpoint_url: Optional[str] = Field(default=None, env="STORAGE_ENDPOINT_URL")
     
     # Security Configuration
-    secret_key: str = Field(env="SECRET_KEY")
+    # Application-wide secret (default for local dev only)
+    secret_key: str = Field(default="""22222222222222222222222222222222""", env="SECRET_KEY")
     cors_origins: List[str] = Field(default=["http://localhost:3000"], env="CORS_ORIGINS")
     cors_allow_credentials: bool = Field(default=True, env="CORS_ALLOW_CREDENTIALS")
     rate_limit_per_minute: int = Field(default=100, env="RATE_LIMIT_PER_MINUTE")

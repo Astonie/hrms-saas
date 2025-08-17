@@ -4,13 +4,19 @@ Represents detailed employee information and HR data.
 """
 
 from datetime import datetime, date
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from sqlalchemy import Column, String, Boolean, DateTime, Text, Integer, Enum, ForeignKey, Date, Numeric, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 import enum
 
 from .base import BaseUUIDModel
+
+if TYPE_CHECKING:
+    from .user import User
+    from .leave import LeaveRequest, LeaveBalance
+    from .performance import PerformanceReview, PerformanceGoal
+    from .payroll import PayrollEntry
 
 
 class EmploymentStatus(str, enum.Enum):
@@ -67,6 +73,9 @@ class Employee(BaseUUIDModel):
     
     __tablename__ = "employees"
     
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
+    
     # Reference to User
     user_id: Mapped[str] = mapped_column(
         String(36), 
@@ -113,6 +122,17 @@ class Employee(BaseUUIDModel):
     
     # Compensation
     base_salary: Mapped[Optional[Numeric]] = mapped_column(Numeric(10, 2), nullable=True)
+    # Tests expect a `salary` attribute
+    @property
+    def salary(self) -> Optional[float]:
+        return float(self.base_salary) if self.base_salary is not None else None
+    
+    @salary.setter
+    def salary(self, value):
+        try:
+            self.base_salary = value
+        except Exception:
+            self.base_salary = None
     hourly_rate: Mapped[Optional[Numeric]] = mapped_column(Numeric(8, 2), nullable=True)
     currency: Mapped[str] = mapped_column(String(3), default="USD", nullable=False)
     pay_frequency: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
@@ -163,7 +183,11 @@ class Employee(BaseUUIDModel):
     
     # Relationships
     user: Mapped["User"] = relationship("User", backref="employee")
-    department: Mapped[Optional["Department"]] = relationship("Department", back_populates="employees")
+    department: Mapped[Optional["Department"]] = relationship(
+        "Department",
+        back_populates="employees",
+        foreign_keys=[department_id]
+    )
     supervisor: Mapped[Optional["Employee"]] = relationship(
         "Employee", 
         remote_side="Employee.id",
@@ -180,6 +204,13 @@ class Employee(BaseUUIDModel):
     # Leave Management Relationships
     leave_requests: Mapped[List["LeaveRequest"]] = relationship("LeaveRequest", back_populates="employee", foreign_keys="LeaveRequest.employee_id")
     leave_balances: Mapped[List["LeaveBalance"]] = relationship("LeaveBalance", back_populates="employee")
+    
+    # Performance Management Relationships
+    performance_reviews: Mapped[List["PerformanceReview"]] = relationship("PerformanceReview", foreign_keys="PerformanceReview.employee_id", back_populates="employee")
+    goals: Mapped[List["PerformanceGoal"]] = relationship("PerformanceGoal", foreign_keys="PerformanceGoal.employee_id", back_populates="employee")
+    
+    # Payroll Relationships
+    payroll_entries: Mapped[List["PayrollEntry"]] = relationship("PayrollEntry", foreign_keys="PayrollEntry.employee_id", back_populates="employee")
     
     def __repr__(self):
         return f"<Employee(id={self.id}, employee_id='{self.employee_id}', name='{self.user.full_name if self.user else 'Unknown'}')>"
@@ -198,6 +229,14 @@ class Employee(BaseUUIDModel):
     def is_active_employee(self) -> bool:
         """Check if employee is currently active."""
         return self.employment_status == EmploymentStatus.ACTIVE
+
+    @property
+    def employment_length_days(self) -> Optional[int]:
+        """Calculate employment length in days between hire and termination."""
+        if not self.hire_date or not self.termination_date:
+            return None
+        delta = self.termination_date - self.hire_date
+        return delta.days
     
     @property
     def is_on_probation(self) -> bool:
@@ -281,6 +320,9 @@ class Department(BaseUUIDModel):
     
     __tablename__ = "departments"
     
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
+    
     # Basic Information
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     code: Mapped[str] = mapped_column(String(50), nullable=False, unique=True, index=True)
@@ -320,8 +362,9 @@ class Department(BaseUUIDModel):
         foreign_keys=[department_head_id]
     )
     employees: Mapped[List["Employee"]] = relationship(
-        "Employee", 
-        back_populates="department"
+        "Employee",
+        back_populates="department",
+        foreign_keys="[Employee.department_id]"
     )
     
     def __repr__(self):

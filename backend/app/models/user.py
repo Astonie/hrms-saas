@@ -4,13 +4,16 @@ Handles authentication, authorization, and user management.
 """
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from sqlalchemy import Column, String, Boolean, DateTime, Text, Integer, Enum, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 import enum
 
 from .base import BaseUUIDModel
+
+if TYPE_CHECKING:
+    from .tenant import Tenant
 
 
 class UserStatus(str, enum.Enum):
@@ -32,83 +35,62 @@ class UserType(str, enum.Enum):
 
 
 class Role(BaseUUIDModel):
+    """Role model for role-based access control (RBAC).
+
+    Minimal, well-indented implementation matching tests.
     """
-    Role model for role-based access control (RBAC).
-    
-    Each tenant has their own set of roles with specific permissions.
-    """
-    
+
     __tablename__ = "roles"
-    
+
     # Basic Information
     name: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    display_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    
-    # Permissions
-    permissions: Mapped[dict] = mapped_column(
-        JSONB, 
-        default=dict, 
-        nullable=False
-    )
-    
-    # Role Hierarchy
-    parent_role_id: Mapped[Optional[str]] = mapped_column(
-        String(36), 
-        ForeignKey("roles.id"), 
-        nullable=True
-    )
-    
-    # Role Settings
+    display_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
+    # Permissions stored as {module: [perms]}
+    permissions: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
+
+    # Hierarchy
+    parent_role_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("roles.id"), nullable=True)
     is_system_role: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     priority: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    
+
     # Relationships
-    parent_role: Mapped[Optional["Role"]] = relationship(
-        "Role", 
-        remote_side="Role.id",
-        back_populates="child_roles"
-    )
-    child_roles: Mapped[List["Role"]] = relationship(
-        "Role", 
-        back_populates="parent_role"
-    )
-    user_roles: Mapped[List["UserRole"]] = relationship(
-        "UserRole", 
-        back_populates="role"
-    )
-    
+    parent_role: Mapped[Optional["Role"]] = relationship("Role", remote_side="Role.id", back_populates="child_roles")
+    child_roles: Mapped[List["Role"]] = relationship("Role", back_populates="parent_role")
+    user_roles: Mapped[List["UserRole"]] = relationship("UserRole", back_populates="role")
+
     def __repr__(self):
-        return f"<Role(id={self.id}, name='{self.name}')>"
-    
-    def has_permission(self, permission: str) -> bool:
-        """Check if role has a specific permission."""
-        return self.permissions.get(permission, False)
-    
-    def add_permission(self, permission: str):
-        """Add a permission to the role."""
+        return f"<Role(name='{self.name}')>"
+
+    def __str__(self) -> str:
+        return self.name
+
+    def has_permission(self, module: str, permission: str) -> bool:
+        perms = self.permissions or {}
+        return permission in perms.get(module, [])
+
+    def add_permission(self, module: str, permission: str):
         if not self.permissions:
             self.permissions = {}
-        self.permissions[permission] = True
-    
-    def remove_permission(self, permission: str):
-        """Remove a permission from the role."""
-        if self.permissions and permission in self.permissions:
-            del self.permissions[permission]
-    
+        if module not in self.permissions:
+            self.permissions[module] = []
+        if permission not in self.permissions[module]:
+            self.permissions[module].append(permission)
+
+    def remove_permission(self, module: str, permission: str):
+        if self.permissions and module in self.permissions and permission in self.permissions[module]:
+            self.permissions[module].remove(permission)
+
     def get_all_permissions(self) -> List[str]:
-        """Get all permissions for this role and its parent roles."""
         permissions = set()
-        
-        # Add current role permissions
         if self.permissions:
-            permissions.update(self.permissions.keys())
-        
-        # Add parent role permissions
+            for module, perms in self.permissions.items():
+                permissions.update(perms)
         if self.parent_role:
             permissions.update(self.parent_role.get_all_permissions())
-        
         return list(permissions)
 
 
@@ -124,8 +106,8 @@ class User(BaseUUIDModel):
     # Basic Information
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    last_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    first_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    last_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     middle_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     
     # Authentication
@@ -165,10 +147,26 @@ class User(BaseUUIDModel):
         default=UserType.EMPLOYEE, 
         nullable=False
     )
+
+    # Multi-tenant
+    tenant_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+    ForeignKey("public.tenants.id"),
+        nullable=True,
+        index=True,
+    )
+
+    # Relationship back to tenant
+    tenant: Mapped[Optional["Tenant"]] = relationship(
+        "Tenant",
+        back_populates="users",
+        foreign_keys="User.tenant_id"
+    )
     
     # Security
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    lock_reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     locked_until: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     
     # Preferences
@@ -203,7 +201,10 @@ class User(BaseUUIDModel):
     @property
     def display_name(self) -> str:
         """Get user's display name."""
-        return self.full_name
+        # Fallback to username if no full name present
+        if self.first_name or self.last_name:
+            return self.full_name
+        return self.username
     
     @property
     def is_authenticated(self) -> bool:
@@ -232,11 +233,17 @@ class User(BaseUUIDModel):
             permissions.update(role.get_all_permissions())
         return list(permissions)
     
-    def lock_account(self, duration_minutes: int = 30):
-        """Lock the user account for a specified duration."""
+    def lock_account(self, lock_reason: Optional[str] = None, duration_minutes: int = 30):
+        """Lock the user account with optional reason and duration."""
         from datetime import timedelta
         self.is_locked = True
-        self.locked_until = datetime.utcnow() + timedelta(minutes=duration_minutes)
+        # store reason
+        self.lock_reason = lock_reason
+        try:
+            minutes = int(duration_minutes)
+        except Exception:
+            minutes = 30
+        self.locked_until = datetime.utcnow() + timedelta(minutes=minutes)
     
     def unlock_account(self):
         """Unlock the user account."""
@@ -246,6 +253,8 @@ class User(BaseUUIDModel):
     
     def record_failed_login(self):
         """Record a failed login attempt."""
+        if self.failed_login_attempts is None:
+            self.failed_login_attempts = 0
         self.failed_login_attempts += 1
         if self.failed_login_attempts >= 5:
             self.lock_account()
@@ -266,6 +275,20 @@ class User(BaseUUIDModel):
         if not self.preferences:
             self.preferences = {}
         self.preferences[key] = value
+
+    def assign_role(self, role: Role):
+        """Assign a role to the user by creating a UserRole entry."""
+        from .user import UserRole
+        ur = UserRole(user_id=self.id or None, role_id=role.id or None)
+        ur.role = role
+        self.user_roles.append(ur)
+
+    def remove_role(self, role: Role):
+        """Remove a role assignment for the user."""
+        self.user_roles = [ur for ur in self.user_roles if ur.role != role]
+
+    def reset_failed_login_attempts(self):
+        self.failed_login_attempts = 0
 
 
 class UserRole(BaseUUIDModel):

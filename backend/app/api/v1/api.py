@@ -9,17 +9,34 @@ from .auth import router as auth_router
 from .employees import router as employees_router
 from .departments import router as departments_router
 from .leave import router as leave_router
+from .tenants import router as tenants_router
+from .dashboard import router as dashboard_router
+from .performance import router as performance_router
+from .payroll import router as payroll_router
 
 # TODO: Add other HR modules as they are implemented
-# from .payroll import router as payroll_router
-# from .performance import router as performance_router
 # from .recruitment import router as recruitment_router
 # from .attendance import router as attendance_router
 # from .documents import router as documents_router
 # from .users import router as users_router
-# from .tenants import router as tenants_router
 
 api_router = APIRouter()
+
+
+@api_router.get("/", tags=["API"])
+async def api_root():
+    """API root that lists available sub-routers (helpful for debugging)."""
+    return {
+        "message": "HRMS-SAAS API v1",
+        "routes": [
+            "/auth",
+            "/employees",
+            "/departments",
+            "/leave",
+            "/tenants",
+            "/dashboard",
+        ],
+    }
 
 # Authentication and User Management
 api_router.include_router(
@@ -47,16 +64,35 @@ api_router.include_router(
     tags=["Leave Management"]
 )
 
-# TODO: Include other HR modules as they are implemented
-# api_router.include_router(
-#     payroll_router,
-#     prefix="/payroll",
-#     tags=["Payroll Management"]
-# )
+# Tenant Management
+api_router.include_router(
+    tenants_router,
+    prefix="/tenants",
+    tags=["Tenant Management"]
+)
 
-# api_router.include_router(
-#     performance_router,
-#     prefix="/performance",
+# Dashboard and Analytics
+api_router.include_router(
+    dashboard_router,
+    prefix="/dashboard",
+    tags=["Dashboard & Analytics"]
+)
+
+# Performance Management
+api_router.include_router(
+    performance_router,
+    prefix="/performance",
+    tags=["Performance Management"]
+)
+
+# Payroll Management
+api_router.include_router(
+    payroll_router,
+    prefix="/payroll",
+    tags=["Payroll Management"]
+)
+
+# TODO: Include other HR modules as they are implemented
 #     tags=["Performance Management"]
 # )
 
@@ -82,10 +118,4 @@ api_router.include_router(
 #     users_router,
 #     prefix="/users",
 #     tags=["User Management"]
-# )
-
-# api_router.include_router(
-#     tenants_router,
-#     prefix="/tenants",
-#     tags=["Tenant Management"]
 # )

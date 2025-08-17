@@ -5,8 +5,18 @@ import { useAuth } from './hooks/useAuth'
 // Lazy load components for better performance
 const Login = React.lazy(() => import('./pages/auth/Login'))
 const Dashboard = React.lazy(() => import('./pages/dashboard/Dashboard'))
+const Employees = React.lazy(() => import('./pages/employees/Employees'))
+const Departments = React.lazy(() => import('./pages/departments/Departments'))
+const Leave = React.lazy(() => import('./pages/leave/Leave'))
+const Reports = React.lazy(() => import('./pages/reports/Reports'))
 const Layout = React.lazy(() => import('./components/layout/Layout'))
 const LoadingSpinner = React.lazy(() => import('./components/ui/LoadingSpinner'))
+
+// Enterprise Features
+const EmployeeProfile = React.lazy(() => import('./components/employee/EmployeeProfile'))
+const OrganizationalChart = React.lazy(() => import('./pages/organization/OrganizationalChart'))
+const PerformanceManagement = React.lazy(() => import('./pages/performance/PerformanceManagement'))
+const PayrollManagement = React.lazy(() => import('./pages/payroll/PayrollManagement'))
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -67,38 +77,53 @@ function App() {
             
             {/* Employee Management */}
             <Route path="employees">
-              <Route index element={<div>Employees List</div>} />
+              <Route index element={<Employees />} />
               <Route path="new" element={<div>New Employee</div>} />
-              <Route path=":id" element={<div>Employee Details</div>} />
+              <Route path=":id" element={<EmployeeProfile />} />
               <Route path=":id/edit" element={<div>Edit Employee</div>} />
             </Route>
 
             {/* Department Management */}
             <Route path="departments">
-              <Route index element={<div>Departments List</div>} />
+              <Route index element={<Departments />} />
               <Route path="new" element={<div>New Department</div>} />
               <Route path=":id" element={<div>Department Details</div>} />
               <Route path=":id/edit" element={<div>Edit Department</div>} />
             </Route>
 
+            {/* Organization */}
+            <Route path="organization">
+              <Route index element={<OrganizationalChart />} />
+              <Route path="chart" element={<OrganizationalChart />} />
+              <Route path="structure" element={<div>Org Structure</div>} />
+            </Route>
+
             {/* Leave Management */}
             <Route path="leave">
-              <Route index element={<div>Leave Requests</div>} />
+              <Route index element={<Leave />} />
               <Route path="new" element={<div>New Leave Request</div>} />
               <Route path=":id" element={<div>Leave Request Details</div>} />
               <Route path="calendar" element={<div>Leave Calendar</div>} />
             </Route>
 
+            {/* Reports */}
+            <Route path="reports">
+              <Route index element={<Reports />} />
+              <Route path="payroll" element={<div>Payroll Reports</div>} />
+              <Route path="attendance" element={<div>Attendance Reports</div>} />
+              <Route path="performance" element={<div>Performance Reports</div>} />
+            </Route>
+
             {/* Payroll Management */}
             <Route path="payroll">
-              <Route index element={<div>Payroll Overview</div>} />
+              <Route index element={<PayrollManagement />} />
               <Route path="employees" element={<div>Employee Payroll</div>} />
               <Route path="reports" element={<div>Payroll Reports</div>} />
             </Route>
 
             {/* Performance Management */}
             <Route path="performance">
-              <Route index element={<div>Performance Overview</div>} />
+              <Route index element={<PerformanceManagement />} />
               <Route path="reviews" element={<div>Performance Reviews</div>} />
               <Route path="goals" element={<div>Goals & Objectives</div>} />
             </Route>

@@ -127,11 +127,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               },
             });
           } else {
-            // Token is invalid, try to refresh
-            await refreshAuth();
+            // Token is invalid, clear it and set not authenticated
+            console.warn('Invalid token, clearing authentication');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('tenant_id');
+            dispatch({ type: 'AUTH_FAILURE' });
           }
         } catch (error) {
           console.error('Auth check failed:', error);
+          // Clear invalid tokens
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('tenant_id');
           dispatch({ type: 'AUTH_FAILURE' });
         }
       } else {

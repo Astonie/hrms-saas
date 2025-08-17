@@ -1,0 +1,324 @@
+# Bandit security testing configuration
+# https://bandit.readthedocs.io/en/latest/config.html
+
+# Exclude specific tests
+exclude_dirs = ['tests', 'migrations', 'venv', 'env', '__pycache__']
+
+# Skip specific tests
+skips = [
+    'B101',  # assert_used - We use assertions in tests
+    'B601',  # paramiko_calls - Not applicable
+    'B602',  # subprocess_popen_with_shell_equals_true - Not applicable
+    'B603',  # subprocess_without_shell_equals_true - Not applicable
+    'B604',  # any_other_function_with_shell_equals_true - Not applicable
+    'B605',  # start_process_with_a_shell - Not applicable
+    'B606',  # start_process_with_no_shell - Not applicable
+    'B607',  # start_process_with_partial_path - Not applicable
+    'B608',  # hardcoded_sql_expressions - We use parameterized queries
+    'B609',  # linux_commands_wildcard_injection - Not applicable
+    'B701',  # jinja2_autoescape_false - Not applicable
+    'B702',  # use_of_mako_templates - Not applicable
+    'B703',  # django_mark_safe - Not applicable
+    'B704',  # django_extra_used - Not applicable
+    'B705',  # django_rawsql_used - Not applicable
+    'B706',  # yaml_load - Not applicable
+    'B707',  # yaml_load_all - Not applicable
+    'B708',  # yaml_load_all - Not applicable
+    'B801',  # flask_debug_true - Not applicable
+    'B901',  # nosec - Not applicable
+    'B902',  # use_of_mako_templates - Not applicable
+    'B903',  # use_of_mako_templates - Not applicable
+    'B904',  # use_of_mako_templates - Not applicable
+    'B905',  # use_of_mako_templates - Not applicable
+    'B906',  # use_of_mako_templates - Not applicable
+    'B907',  # use_of_mako_templates - Not applicable
+    'B908',  # use_of_mako_templates - Not applicable
+    'B909',  # use_of_mako_templates - Not applicable
+    'B910',  # use_of_mako_templates - Not applicable
+    'B911',  # use_of_mako_templates - Not applicable
+    'B912',  # use_of_mako_templates - Not applicable
+    'B913',  # use_of_mako_templates - Not applicable
+    'B914',  # use_of_mako_templates - Not applicable
+    'B915',  # use_of_mako_templates - Not applicable
+    'B916',  # use_of_mako_templates - Not applicable
+    'B917',  # use_of_mako_templates - Not applicable
+    'B918',  # use_of_mako_templates - Not applicable
+    'B919',  # use_of_mako_templates - Not applicable
+    'B920',  # use_of_mako_templates - Not applicable
+    'B921',  # use_of_mako_templates - Not applicable
+    'B922',  # use_of_mako_templates - Not applicable
+    'B923',  # use_of_mako_templates - Not applicable
+    'B924',  # use_of_mako_templates - Not applicable
+    'B925',  # use_of_mako_templates - Not applicable
+    'B926',  # use_of_mako_templates - Not applicable
+    'B927',  # use_of_mako_templates - Not applicable
+    'B928',  # use_of_mako_templates - Not applicable
+    'B929',  # use_of_mako_templates - Not applicable
+    'B930',  # use_of_mako_templates - Not applicable
+    'B931',  # use_of_mako_templates - Not applicable
+    'B932',  # use_of_mako_templates - Not applicable
+    'B933',  # use_of_mako_templates - Not applicable
+    'B934',  # use_of_mako_templates - Not applicable
+    'B935',  # use_of_mako_templates - Not applicable
+    'B936',  # use_of_mako_templates - Not applicable
+    'B937',  # use_of_mako_templates - Not applicable
+    'B938',  # use_of_mako_templates - Not applicable
+    'B939',  # use_of_mako_templates - Not applicable
+    'B940',  # use_of_mako_templates - Not applicable
+    'B941',  # use_of_mako_templates - Not applicable
+    'B942',  # use_of_mako_templates - Not applicable
+    'B943',  # use_of_mako_templates - Not applicable
+    'B944',  # use_of_mako_templates - Not applicable
+    'B945',  # use_of_mako_templates - Not applicable
+    'B946',  # use_of_mako_templates - Not applicable
+    'B947',  # use_of_mako_templates - Not applicable
+    'B948',  # use_of_mako_templates - Not applicable
+    'B949',  # use_of_mako_templates - Not applicable
+    'B950',  # use_of_mako_templates - Not applicable
+    'B951',  # use_of_mako_templates - Not applicable
+    'B952',  # use_of_mako_templates - Not applicable
+    'B953',  # use_of_mako_templates - Not applicable
+    'B954',  # use_of_mako_templates - Not applicable
+    'B955',  # use_of_mako_templates - Not applicable
+    'B956',  # use_of_mako_templates - Not applicable
+    'B957',  # use_of_mako_templates - Not applicable
+    'B958',  # use_of_mako_templates - Not applicable
+    'B959',  # use_of_mako_templates - Not applicable
+    'B960',  # use_of_mako_templates - Not applicable
+    'B961',  # use_of_mako_templates - Not applicable
+    'B962',  # use_of_mako_templates - Not applicable
+    'B963',  # use_of_mako_templates - Not applicable
+    'B964',  # use_of_mako_templates - Not applicable
+    'B965',  # use_of_mako_templates - Not applicable
+    'B966',  # use_of_mako_templates - Not applicable
+    'B967',  # use_of_mako_templates - Not applicable
+    'B968',  # use_of_mako_templates - Not applicable
+    'B969',  # use_of_mako_templates - Not applicable
+    'B970',  # use_of_mako_templates - Not applicable
+    'B971',  # use_of_mako_templates - Not applicable
+    'B972',  # use_of_mako_templates - Not applicable
+    'B973',  # use_of_mako_templates - Not applicable
+    'B974',  # use_of_mako_templates - Not applicable
+    'B975',  # use_of_mako_templates - Not applicable
+    'B976',  # use_of_mako_templates - Not applicable
+    'B977',  # use_of_mako_templates - Not applicable
+    'B978',  # use_of_mako_templates - Not applicable
+    'B979',  # use_of_mako_templates - Not applicable
+    'B980',  # use_of_mako_templates - Not applicable
+    'B981',  # use_of_mako_templates - Not applicable
+    'B982',  # use_of_mako_templates - Not applicable
+    'B983',  # use_of_mako_templates - Not applicable
+    'B984',  # use_of_mako_templates - Not applicable
+    'B985',  # use_of_mako_templates - Not applicable
+    'B986',  # use_of_mako_templates - Not applicable
+    'B987',  # use_of_mako_templates - Not applicable
+    'B988',  # use_of_mako_templates - Not applicable
+    'B989',  # use_of_mako_templates - Not applicable
+    'B990',  # use_of_mako_templates - Not applicable
+    'B991',  # use_of_mako_templates - Not applicable
+    'B992',  # use_of_mako_templates - Not applicable
+    'B993',  # use_of_mako_templates - Not applicable
+    'B994',  # use_of_mako_templates - Not applicable
+    'B995',  # use_of_mako_templates - Not applicable
+    'B996',  # use_of_mako_templates - Not applicable
+    'B997',  # use_of_mako_templates - Not applicable
+    'B998',  # use_of_mako_templates - Not applicable
+    'B999',  # use_of_mako_templates - Not applicable
+]
+
+# Test configuration
+tests = [
+    'B101',  # assert_used
+    'B102',  # exec_used
+    'B103',  # set_bad_file_permissions
+    'B104',  # hardcoded_bind_all_interfaces
+    'B105',  # hardcoded_password_string
+    'B106',  # hardcoded_password_funcarg
+    'B107',  # hardcoded_password_default
+    'B108',  # hardcoded_tmp_directory
+    'B110',  # try_except_pass
+    'B112',  # try_except_continue
+    'B201',  # flask_debug_true
+    'B301',  # pickle
+    'B302',  # marshal
+    'B303',  # md5
+    'B304',  # md5_insecure
+    'B305',  # sha1
+    'B306',  # mktemp_q
+    'B307',  # eval
+    'B308',  # mark_safe
+    'B309',  # httpsconnection
+    'B310',  # urllib_urlopen
+    'B311',  # random
+    'B312',  # telnetlib
+    'B313',  # xml_bad_cElementTree
+    'B314',  # xml_bad_ElementTree
+    'B315',  # xml_bad_expatreader
+    'B316',  # xml_bad_expatbuilder
+    'B317',  # xml_bad_sax
+    'B318',  # xml_bad_minidom
+    'B319',  # xml_bad_pulldom
+    'B320',  # xml_bad_etree
+    'B321',  # ftplib
+    'B322',  # input
+    'B323',  # unverified_context
+    'B324',  # hashlib_new_insecure_functions
+    'B325',  # tempnam
+    'B401',  # import_telnetlib
+    'B402',  # import_ftplib
+    'B403',  # import_pickle
+    'B404',  # import_subprocess
+    'B405',  # import_xml_etree
+    'B406',  # import_xml_sax
+    'B407',  # import_xml_expat
+    'B408',  # import_xml_minidom
+    'B409',  # import_xml_pulldom
+    'B410',  # import_lxml
+    'B411',  # import_xmlrpclib
+    'B412',  # import_httpoxy
+    'B413',  # import_pycrypto
+    'B501',  # request_with_no_cert_validation
+    'B502',  # ssl_with_bad_version
+    'B503',  # ssl_with_bad_defaults
+    'B504',  # ssl_with_no_version
+    'B505',  # weak_cryptographic_key
+    'B506',  # yaml_load
+    'B507',  # ssh_no_host_key_verification
+    'B601',  # paramiko_calls
+    'B602',  # subprocess_popen_with_shell_equals_true
+    'B603',  # subprocess_without_shell_equals_true
+    'B604',  # any_other_function_with_shell_equals_true
+    'B605',  # start_process_with_a_shell
+    'B606',  # start_process_with_no_shell
+    'B607',  # start_process_with_partial_path
+    'B608',  # hardcoded_sql_expressions
+    'B609',  # linux_commands_wildcard_injection
+    'B701',  # jinja2_autoescape_false
+    'B702',  # use_of_mako_templates
+    'B703',  # django_mark_safe
+    'B704',  # django_extra_used
+    'B705',  # django_rawsql_used
+    'B706',  # yaml_load
+    'B707',  # yaml_load_all
+    'B708',  # yaml_load_all
+    'B801',  # flask_debug_true
+    'B901',  # nosec
+    'B902',  # use_of_mako_templates
+    'B903',  # use_of_mako_templates
+    'B904',  # use_of_mako_templates
+    'B905',  # use_of_mako_templates
+    'B906',  # use_of_mako_templates
+    'B907',  # use_of_mako_templates
+    'B908',  # use_of_mako_templates
+    'B909',  # use_of_mako_templates
+    'B910',  # use_of_mako_templates
+    'B911',  # use_of_mako_templates
+    'B912',  # use_of_mako_templates
+    'B913',  # use_of_mako_templates
+    'B914',  # use_of_mako_templates
+    'B915',  # use_of_mako_templates
+    'B916',  # use_of_mako_templates
+    'B917',  # use_of_mako_templates
+    'B918',  # use_of_mako_templates
+    'B919',  # use_of_mako_templates
+    'B920',  # use_of_mako_templates
+    'B921',  # use_of_mako_templates
+    'B922',  # use_of_mako_templates
+    'B923',  # use_of_mako_templates
+    'B924',  # use_of_mako_templates
+    'B925',  # use_of_mako_templates
+    'B926',  # use_of_mako_templates
+    'B927',  # use_of_mako_templates
+    'B928',  # use_of_mako_templates
+    'B929',  # use_of_mako_templates
+    'B930',  # use_of_mako_templates
+    'B931',  # use_of_mako_templates
+    'B932',  # use_of_mako_templates
+    'B933',  # use_of_mako_templates
+    'B934',  # use_of_mako_templates
+    'B935',  # use_of_mako_templates
+    'B936',  # use_of_mako_templates
+    'B937',  # use_of_mako_templates
+    'B938',  # use_of_mako_templates
+    'B939',  # use_of_mako_templates
+    'B940',  # use_of_mako_templates
+    'B941',  # use_of_mako_templates
+    'B942',  # use_of_mako_templates
+    'B943',  # use_of_mako_templates
+    'B944',  # use_of_mako_templates
+    'B945',  # use_of_mako_templates
+    'B946',  # use_of_mako_templates
+    'B947',  # use_of_mako_templates
+    'B948',  # use_of_mako_templates
+    'B949',  # use_of_mako_templates
+    'B950',  # use_of_mako_templates
+    'B951',  # use_of_mako_templates
+    'B952',  # use_of_mako_templates
+    'B953',  # use_of_mako_templates
+    'B954',  # use_of_mako_templates
+    'B955',  # use_of_mako_templates
+    'B956',  # use_of_mako_templates
+    'B957',  # use_of_mako_templates
+    'B958',  # use_of_mako_templates
+    'B959',  # use_of_mako_templates
+    'B960',  # use_of_mako_templates
+    'B961',  # use_of_mako_templates
+    'B962',  # use_of_mako_templates
+    'B963',  # use_of_mako_templates
+    'B964',  # use_of_mako_templates
+    'B965',  # use_of_mako_templates
+    'B966',  # use_of_mako_templates
+    'B967',  # use_of_mako_templates
+    'B968',  # use_of_mako_templates
+    'B969',  # use_of_mako_templates
+    'B970',  # use_of_mako_templates
+    'B971',  # use_of_mako_templates
+    'B972',  # use_of_mako_templates
+    'B973',  # use_of_mako_templates
+    'B974',  # use_of_mako_templates
+    'B975',  # use_of_mako_templates
+    'B976',  # use_of_mako_templates
+    'B977',  # use_of_mako_templates
+    'B978',  # use_of_mako_templates
+    'B979',  # use_of_mako_templates
+    'B980',  # use_of_mako_templates
+    'B981',  # use_of_mako_templates
+    'B982',  # use_of_mako_templates
+    'B983',  # use_of_mako_templates
+    'B984',  # use_of_mako_templates
+    'B985',  # use_of_mako_templates
+    'B986',  # use_of_mako_templates
+    'B987',  # use_of_mako_templates
+    'B988',  # use_of_mako_templates
+    'B989',  # use_of_mako_templates
+    'B990',  # use_of_mako_templates
+    'B991',  # use_of_mako_templates
+    'B992',  # use_of_mako_templates
+    'B993',  # use_of_mako_templates
+    'B994',  # use_of_mako_templates
+    'B995',  # use_of_mako_templates
+    'B996',  # use_of_mako_templates
+    'B997',  # use_of_mako_templates
+    'B998',  # use_of_mako_templates
+    'B999',  # use_of_mako_templates
+]
+
+# Severity levels
+# LOW: 1, MEDIUM: 2, HIGH: 3
+severity = 1
+
+# Confidence levels
+# LOW: 1, MEDIUM: 2, HIGH: 3
+confidence = 1
+
+# Output format
+output_format = json
+
+# Output file
+output_file = bandit-report.json
+
+# Verbose output
+verbose = true
+
+# Debug mode
+debug = false

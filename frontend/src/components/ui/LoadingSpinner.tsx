@@ -50,6 +50,9 @@ export default function LoadingSpinner({
   );
 }
 
+// Also export as named export for flexibility
+export { LoadingSpinner };
+
 // Full screen loading spinner
 export function FullScreenSpinner() {
   return (

@@ -37,6 +37,9 @@ class LeaveRequest(BaseUUIDModel):
     """Leave request model."""
     __tablename__ = "leave_requests"
     
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
+    
     employee_id: Mapped[str] = mapped_column(String(36), ForeignKey("employees.id"), nullable=False, index=True)
     leave_type: Mapped[LeaveType] = mapped_column(SQLEnum(LeaveType), nullable=False, index=True)
     start_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
@@ -62,6 +65,9 @@ class LeaveBalance(BaseUUIDModel):
     """Leave balance model for tracking employee leave entitlements."""
     __tablename__ = "leave_balances"
     
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
+    
     employee_id: Mapped[str] = mapped_column(String(36), ForeignKey("employees.id"), nullable=False, index=True)
     leave_type: Mapped[LeaveType] = mapped_column(SQLEnum(LeaveType), nullable=False, index=True)
     year: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
@@ -84,6 +90,9 @@ class LeavePolicy(BaseUUIDModel):
     """Leave policy model for defining leave rules and entitlements."""
     __tablename__ = "leave_policies"
     
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
+    
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     leave_type: Mapped[LeaveType] = mapped_column(SQLEnum(LeaveType), nullable=False, index=True)
@@ -101,6 +110,9 @@ class LeaveCalendar(BaseUUIDModel):
     """Leave calendar model for tracking holidays and company events."""
     __tablename__ = "leave_calendars"
     
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
+    
     date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     is_holiday: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     holiday_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
@@ -114,6 +126,9 @@ class LeaveCalendar(BaseUUIDModel):
 class LeaveApprovalWorkflow(BaseUUIDModel):
     """Leave approval workflow model for defining approval chains."""
     __tablename__ = "leave_approval_workflows"
+    
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
     
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -131,6 +146,9 @@ class LeaveApprovalWorkflow(BaseUUIDModel):
 class LeaveNotification(BaseUUIDModel):
     """Leave notification model for tracking notifications sent to approvers and employees."""
     __tablename__ = "leave_notifications"
+    
+    # Multi-tenant isolation
+    tenant_id: Mapped[int] = mapped_column(Integer, ForeignKey("public.tenants.id"), nullable=False, index=True)
     
     leave_request_id: Mapped[str] = mapped_column(String(36), ForeignKey("leave_requests.id"), nullable=False, index=True)
     recipient_id: Mapped[str] = mapped_column(String(36), ForeignKey("employees.id"), nullable=False, index=True)
